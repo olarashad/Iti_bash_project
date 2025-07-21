@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# Simple Bash DBMS CLI
+# Each database is a directory; each table is a CSV file + a .meta file describing columns
+
+
+
+
+# Globals
+DB_PATH=""
+
+# Helpers
+function pause() {
+  read -rp "\nPress [Enter] to continue..."
+}
+
+# ------- Main Menu Functions -------
+function create_database() {
+  read -rp "Enter database name: " db
+  if [[ -z "$db" ]]; then
+    echo "Name cannot be empty."
+  elif [[ -d "$db" ]]; then
+    echo "Database '$db' already exists."
+  else
+    mkdir -p "$db"
+    echo "Database '$db' created."
+  fi
+  pause
+}
+  
+function list_databases() {
+  echo "Available databases:"
+  shopt -s nullglob
+  local dbs=(*/)
+  shopt -u nullglob
+  if [[ ${#dbs[@]} -eq 0 ]]; then
+    echo "There are no databases."
+  else
+    for d in "${dbs[@]}"; do
+      echo "${d%/}"
+    done
+  fi
+  pause
+}
+
+
+function drop_database() {
+  read -rp "Enter database name to drop: " db
+  if [[ -d "$db" ]]; then
+    read -rp "Are you sure you want to drop '$db'? This cannot be undone (y/N): " confirm
+    if [[ $confirm =~ ^[Yy]$ ]]; then
+      rm -rf "$db"
+      echo "Database '$db' dropped."
+    else
+      echo "Operation canceled."
+    fi
+  else
+    echo "Database '$db' does not exist."
+  fi
+  pause
+}
+
+function connect_database() {
+  read -rp "Enter database name to connect: " db
+  if [[ -d "$db" ]]; then
+    DB_PATH="$db"
+    echo "Connected to database '$db'."
+    database_menu
+  else
+    echo "Database '$db' does not exist."
+    pause
+  fi
+}
+# ------- Menu Loops -------
+function main_menu() {
+  while true; do
+    clear
+    echo "=== Bash DBMS ==="
+    echo "1) Create Database"
+    echo "2) List Databases"
+    echo "3) Connect to Database"
+    echo "4) Drop Database"
+    echo "5) Exit"
+    read -rp "Select an option [1-5]: " opt
+    case $opt in
+      1) create_database;;
+      2) list_databases;;
+      3) connect_database;;
+      4) drop_database;;
+      5) echo "Goodbye!"; exit 0;;
+      *) echo "Invalid option."; pause;;
+    esac
+  done
+}
+
+# Entry point
+enable_paging() {
+  shopt -s extglob
+}
+
+
+
+enable_paging
+main_menu
