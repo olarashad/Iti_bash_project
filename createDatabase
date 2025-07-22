@@ -18,10 +18,10 @@ function create_database() {
   read -rp "Enter database name: " db
   if [[ -z "$db" ]]; then
     echo "Name cannot be empty."
-  elif [[ -d "$db" ]]; then
+  elif [[ -d "databases/$db" ]]; then
     echo "Database '$db' already exists."
   else
-    mkdir -p "$db"
+    mkdir -p "databases/$db"
     echo "Database '$db' created."
   fi
   pause
@@ -59,17 +59,27 @@ function drop_database() {
   pause
 }
 
+
 function connect_database() {
   read -rp "Enter database name to connect: " db
-  if [[ -d "$db" ]]; then
-    DB_PATH="$db"
-    echo "Connected to database '$db'."
-    database_menu
-  else
-    echo "Database '$db' does not exist."
-    pause
-  fi
+  ./connect_db.sh "$db"
 }
+
+# function connect_database() {
+#   read -rp "Enter database name to connect: " db
+#   if [[ -d "$db" ]]; then
+#     currentDb="$db"
+#     export currentDb
+#     echo "Connected to database '$db'."
+    
+#     # Call the script responsible for opening the table menu
+#     ./connect_db.sh "$db"
+#   else
+#     echo "❌ Database '$db' does not exist."
+#     pause
+#   fi
+# }
+
 # ------- Menu Loops -------
 function main_menu() {
   while true; do
