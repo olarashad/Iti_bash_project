@@ -6,7 +6,7 @@
 
 
 # Globals
-DB_PATH=""
+DATABASE_DIR="./databases"
 
 # Helpers
 function pause() {
@@ -18,58 +18,47 @@ function create_database() {
   read -rp "Enter database name: " db
   if [[ -z "$db" ]]; then
     echo "Name cannot be empty."
-  elif [[ -d "$db" ]]; then
+  elif [[ -d "databases/$db" ]]; then
     echo "Database '$db' already exists."
   else
-    mkdir -p "$db"
+    mkdir -p "databases/$db"
     echo "Database '$db' created."
   fi
   pause
 }
   
 function list_databases() {
-  echo "Available databases:"
-  shopt -s nullglob
-  local dbs=(*/)
-  shopt -u nullglob
-  if [[ ${#dbs[@]} -eq 0 ]]; then
-    echo "There are no databases."
-  else
-    for d in "${dbs[@]}"; do
-      echo "${d%/}"
-    done
-  fi
-  pause
+    ./listDatabase.sh DATABASE_DIR="./databases"
+
 }
 
 
 function drop_database() {
-  read -rp "Enter database name to drop: " db
-  if [[ -d "$db" ]]; then
-    read -rp "Are you sure you want to drop '$db'? This cannot be undone (y/N): " confirm
-    if [[ $confirm =~ ^[Yy]$ ]]; then
-      rm -rf "$db"
-      echo "Database '$db' dropped."
-    else
-      echo "Operation canceled."
-    fi
-  else
-    echo "Database '$db' does not exist."
-  fi
-  pause
+  ./dropDatabase  DATABASE_DIR="./databases"
+
 }
+
 
 function connect_database() {
   read -rp "Enter database name to connect: " db
-  if [[ -d "$db" ]]; then
-    DB_PATH="$db"
-    echo "Connected to database '$db'."
-    database_menu
-  else
-    echo "Database '$db' does not exist."
-    pause
-  fi
+  ./connect_db.sh "$db"
 }
+
+# function connect_database() {
+#   read -rp "Enter database name to connect: " db
+#   if [[ -d "$db" ]]; then
+#     currentDb="$db"
+#     export currentDb
+#     echo "Connected to database '$db'."
+    
+#     # Call the script responsible for opening the table menu
+#     ./connect_db.sh "$db"
+#   else
+#     echo "❌ Database '$db' does not exist."
+#     pause
+#   fi
+# }
+
 # ------- Menu Loops -------
 function main_menu() {
   while true; do
