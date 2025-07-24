@@ -6,7 +6,7 @@
 
 
 # Globals
-DB_PATH=""
+DATABASE_DIR="./databases"
 
 # Helpers
 function pause() {
@@ -28,35 +28,14 @@ function create_database() {
 }
   
 function list_databases() {
-  echo "Available databases:"
-  shopt -s nullglob
-  local dbs=(*/)
-  shopt -u nullglob
-  if [[ ${#dbs[@]} -eq 0 ]]; then
-    echo "There are no databases."
-  else
-    for d in "${dbs[@]}"; do
-      echo "${d%/}"
-    done
-  fi
-  pause
+    ./listDatabase.sh DATABASE_DIR="./databases"
+
 }
 
 
 function drop_database() {
-  read -rp "Enter database name to drop: " db
-  if [[ -d "$db" ]]; then
-    read -rp "Are you sure you want to drop '$db'? This cannot be undone (y/N): " confirm
-    if [[ $confirm =~ ^[Yy]$ ]]; then
-      rm -rf "$db"
-      echo "Database '$db' dropped."
-    else
-      echo "Operation canceled."
-    fi
-  else
-    echo "Database '$db' does not exist."
-  fi
-  pause
+  ./dropDatabase  DATABASE_DIR="./databases"
+
 }
 
 
