@@ -14,7 +14,7 @@ do
         ;;
         2)
             echo "Listing Tables"
-            ./listTables.sh "list"
+            ./listTable.sh "list"
         ;;
         3)
             echo "Drop Table"
