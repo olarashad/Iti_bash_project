@@ -1,1 +1,2 @@
-ola,id,int,name,varchar,id
+ola,id,int,name,int,id
+pop,id,int,name,int,age,int,id

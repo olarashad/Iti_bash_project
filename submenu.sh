@@ -22,7 +22,7 @@ do
         ;; 
         4)
             echo "Insert into Table"
-            ./insertRow.sh
+            ./Insert_into.sh
         ;;
 	    5)
             echo "Select From Table"
