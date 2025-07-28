@@ -26,7 +26,7 @@ do
         ;;
 	    5)
             echo "Select From Table"
-            ./selectRow.sh
+            ./select_from.sh
         ;;
 	    6)
             echo "Delete From Table"

@@ -1,1 +1,1 @@
-id,int,name,varchar,id
+id,int,name,varchar,PK:id

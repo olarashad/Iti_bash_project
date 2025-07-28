@@ -89,7 +89,8 @@ function addPrimary {
         done
         tableDef+=",$primaryKey"
 
-        echo "$tableDef" >> "databases/$currentDb/Schema"
+        printf "\nPK:%s\n" "$primaryKey" >> databases/$currentDb/${tableName}_Schema
+        printf "\nPK:%s\n" "$primaryKey" >> databases/$currentDb/Schema
         echo "✅ Primary key '$primaryKey' set successfully!"
     else
         echo "❌ '$primaryKey' is not one of the columns. Try again."

@@ -55,7 +55,7 @@ function countTableField {
 
     ((fieldCounter=1))
     ((arrayCounter=0))
-    for ((j=0;j<"$fieldLoopCounter";j++)); do
+    for ((j=0;j<$fieldLoopCounter"\;j++)); do
         i=$(cut -f$fieldCounter -d, databases/$currentDb/${tbName}_Schema)
         if [[ $i != "int" && $i != "varchar" && $i != "string" ]]; then
             fieldsArray[$arrayCounter]=$i

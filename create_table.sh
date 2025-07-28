@@ -118,8 +118,12 @@ function addPrimary {
         echo "❌ Invalid column name. Please try again."
         addPrimary
     else
-        echo -e "$primaryKey" >> databases/$currentDb/${tableName}_Schema
-        echo -e "$primaryKey" >> databases/$currentDb/Schema
+        printf "\nPK:%s\n" "$primaryKey" >> databases/$currentDb/${tableName}_Schema
+        printf "\nPK:%s\n" "$primaryKey" >> databases/$currentDb/Schema
+
+        # echo "PK:$primaryKey" >> databases/$currentDb/Schema
+        # echo -e "$primaryKey" >> databases/$currentDb/Schema
+        
         echo "✅ Primary key '$primaryKey' set successfully!"
         
     
