@@ -6,7 +6,7 @@
 
 
 # Globals
-DATABASE_DIR="./databases"
+DB_PATH=""
 
 # Helpers
 function pause() {
@@ -21,21 +21,46 @@ function create_database() {
   elif [[ -d "databases/$db" ]]; then
     echo "Database '$db' already exists."
   else
-    mkdir -p "databases/$db"
-    echo "Database '$db' created."
+    while true; do
+      read -rsp "🔐 Enter password for database '$db': " password
+      echo
+      read -rsp "🔁 Confirm password: " confirm
+      echo
+      if [[ "$password" == "$confirm" && -n "$password" ]]; then
+        break
+      else
+        echo "❌ Passwords do not match or are empty. Try again."
+      fi
+    done
+   mkdir -p "databases/$db"
+    echo -n "$password" > "databases/$db/.dbpass"
+    chmod 600 "databases/$db/.dbpass"
+
+    echo "✅ Database '$db' created and secured with a password."
   fi
   pause
 }
   
 function list_databases() {
-    ./listDatabase.sh DATABASE_DIR="./databases"
-
+    function list_databases() {
+  echo "Available databases:"
+  shopt -s nullglob
+  local dbs=(*./databases/)
+  shopt -u nullglob
+  if [[ ${#dbs[@]} -eq 0 ]]; then
+    echo "There are no databases."
+  else
+    for d in "${dbs[@]}"; do
+      echo "${d%/}"
+    done
+  fi
+  pause
+}
 }
 
 
 function drop_database() {
-  ./dropDatabase  DATABASE_DIR="./databases"
-
+  ./dropDatabase.sh 
 }
 
 

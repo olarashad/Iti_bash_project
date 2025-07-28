@@ -1,4 +1,0 @@
-pop,id,int,name,int,age,int,id
-ola,id,int,name,varchar,PK:id
-mero,id,int,name,varchar,
-PK:id

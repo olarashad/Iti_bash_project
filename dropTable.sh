@@ -22,7 +22,7 @@ if [ ! -f "$tableFile" ]; then
 fi
 
 # Delete table and related files
-rm -f "$tableFile" "$schemaFile" 2>>./.error.log
+rm -f "$tableFile" "$schemaFile" 
 sed -i "/^$tbName,/d" "$schemaList"
 
 echo "✅ Table '$tbName' deleted successfully."

@@ -5,7 +5,7 @@
 PS3="hosql-${currentDb}>"
 
 # Display Table Actions
-select choice in "Create Table" "List Tables" "Drop Table" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Table Meta Data" "Exit"
+select choice in "Create Table" "List Tables" "Drop Table" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Exit"
 do
     case $REPLY in
         1) 
@@ -30,19 +30,15 @@ do
         ;;
 	    6)
             echo "Delete From Table"
-            ./deleteRow.sh
+            ./delete.sh
         ;;
 	    7)
             echo "Update Table"
             ./updateTable.sh
         ;;
-        # 8)
-        #     echo "Table Meta Data"
-	    #     ./metaData.sh
-        # ;;
         8)
             echo "Back To Main Menu"
-            ./create_database.sh 1
+            ./main.sh 1
             exit
         ;;
         *) echo "invaled option"

@@ -1,8 +1,0 @@
-touch: cannot touch 'databases/ola/lk': No such file or directory
-touch: cannot touch 'databases/ola/lk_Schema': No such file or directory
-touch: cannot touch 'databases/ola/lk': No such file or directory
-touch: cannot touch 'databases/ola/lk_Schema': No such file or directory
-rm: cannot remove 'databases/lolo/merz': No such file or directory
-rm: cannot remove 'databases/lolo/merz_Schema': No such file or directory
-awk: cannot open databases/lolo/lolo_Schema (No such file or directory)
-awk: cannot open databases/lolo/_Schema (No such file or directory)

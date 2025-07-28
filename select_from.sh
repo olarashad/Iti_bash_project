@@ -42,11 +42,7 @@ function getTableInfo
     numberOfRows=`wc -l databases/$currentDb/${tbName} | cut -f1 -d' '`
 
     #to count no of fields in the table
-    fieldLoopCounter=`awk -F, '{ print NF }' databases/$currentDb/${tbName}_Schema 2>>./.error.log`
-
-    # if (( $fieldLoopCounter % 2 != 0 )); then
-    #     ((fieldLoopCounter--))  # Ignore last item (assumed to be PK)
-    # fi
+    fieldLoopCounter=`awk -F, '{ print NF }' databases/$currentDb/${tbName}_Schema `
 
     #to know columns of this table
     ((fieldCounter=1))
