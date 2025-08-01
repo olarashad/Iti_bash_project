@@ -66,54 +66,43 @@ function deleteRow {
     done
 }
 
-function delete_special_rows {
-    local tbName="$1"
+delete_special_rows() {
+  local tbName="$1"
+  local tablePath="databases/$currentDb/$tbName"
 
-    read -rp "Enter Column Name: " columnName
-    columnName=$(echo "$columnName" | xargs)
+  if [[ ! -f "$tablePath" ]]; then
+    echo "Table file not found: $tablePath"
+    return 1
+  fi
 
-    # read schema line and strip trailing comma
-    schemaLine=$(head -n1 "databases/$currentDb/${tbName}_Schema" | sed 's/,$//')
-    IFS=',' read -ra parts <<< "$schemaLine"
+  read -rp "Enter key to match (e.g. movie-name): " key
+  read -rp "Enter value to delete for that key: " value
 
-    # find column position (1-based in data rows)
-    colIndex=-1
-    for ((i=0; i<${#parts[@]}; i+=2)); do
-        if [[ "${parts[i]}" == "$columnName" ]]; then
-            colIndex=$((i/2 + 1))
-            break
-        fi
-    done
+tmp=$(mktemp)
 
-    if [[ $colIndex -eq -1 ]]; then
-        echo "Invalid column"
-        return
+while IFS= read -r line; do
+  IFS=',' read -ra fields <<< "$line"
+  match_found=false
+
+  for ((i=0; i<${#fields[@]}; i+=2)); do
+    k="${fields[i]}"
+    v="${fields[i+1]}"
+    if [[ "$k" == "$key" && "$v" == "$value" ]]; then
+      match_found=true
+      break
     fi
+  done
 
-    read -rp "Enter Column Value: " columnValue
-    columnValue=$(echo "$columnValue" | xargs)
+  if ! $match_found; then
+    echo "$line"
+  fi
+done < "$tablePath" > "$tmp"
 
-    # find matching lines
-    mapfile -t toDelete < <(awk -F, -v idx="$colIndex" -v val="$columnValue" '
-        function trim(s){ gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
-        {
-            if (trim($idx) == val) print NR
-        }' "databases/$currentDb/$tbName")
+mv "$tmp" "$tablePath"
+echo "All lines where '$key' == '$value' have been deleted."
 
-    if [ ${#toDelete[@]} -eq 0 ]; then
-        echo "No matching rows found."
-        return
-    fi
-
-    # delete those lines
-    sedExpr=""
-    for ln in "${toDelete[@]}"; do
-        sedExpr+="${ln}d;"
-    done
-    sedExpr=${sedExpr%;}
-
-    sed -i "$sedExpr" "databases/$currentDb/$tbName"
-    echo "Rows with value '$columnValue' in column '$columnName' deleted."
 }
+
+
 
 deleteRow
