@@ -1,106 +1,119 @@
 #!/bin/bash
 
 # Delete Rows
-function deleteRow
-{
-	echo -e "Enter Table Name: \c"
-	read tbName
+function deleteRow {
+    read -rp "Enter Table Name: " tbName
+    tbName=$(echo "$tbName" | xargs)
 
-	#Check if table exists
-	if [ -z $tbName ]
-	then
-		echo "You Must Enter Valid Name"
-		exit
-	# else
-	# 	source ./listTable.sh "call" $tbName
-	fi
+    if [ -z "$tbName" ]; then
+        echo "Error: empty input"
+        echo "Back to table menu..."
+        sleep 2
+        clear
+        ./submenu.sh 2
+        exit
+    fi
 
-	if [ $tableExist -eq 0 ]
-	then
-		echo "Error, table dose not exist"
-		echo "Back to table menu..."
-		sleep 3
-		clear
-		./submenu.sh 2
-		exit
-	else
-		PS3="hosql-${tbName}>"
-		select choice in "Delete All Data" "Delete Special Rows" "Exit"
-		do
-			case $REPLY in
-				1) 
-					`sed -i '1,$d' databases/$currentDb/$tbName 2>>./.error.log`
-					echo "All $tbName Rows Are Deleted"
-					echo "Back to table menu..."
-					sleep 3
-					clear
-					./submenu.sh 2
-					exit
-				;;
-				2)
-					checkColumn
+    tablePath="databases/$currentDb/$tbName"
+    schemaPath="databases/$currentDb/${tbName}_Schema"
 
-					./submenu.sh 2
-					exit
-				;;
-				3)
-					./submenu.sh 2
-					exit
-				;;				
-				*) echo "invaled option"
-				;;
-			esac
-		done 
-        
-	fi
+    if [[ ! -f "$tablePath" ]]; then
+        echo "Error: table does not exist"
+        echo "Back to table menu..."
+        sleep 2
+        clear
+        ./submenu.sh 2
+        exit
+    fi
+
+    PS3="hosql-${tbName}> "
+
+    echo
+    echo "Choose action for table '$tbName':"
+    echo
+
+    select choice in "Delete All Data" "Delete Special Rows" "Exit"; do
+        case $REPLY in
+            1)
+                # truncate (delete all)
+                > "$tablePath"
+                echo "All rows in '$tbName' have been deleted."
+                echo "Back to table menu..."
+                sleep 2
+                clear
+                ./submenu.sh 2
+                exit
+                ;;
+            2)
+                delete_special_rows "$tbName"
+                echo "Back to table menu..."
+                sleep 2
+                clear
+                ./submenu.sh 2
+                exit
+                ;;
+            3)
+                echo "Exiting delete mode, back to previous menu..."
+                sleep 1
+                clear
+                ./submenu.sh 2
+                exit
+                ;;
+            *)
+                echo "Invalid option. Choose 1, 2, or 3."
+                ;;
+        esac
+    done
 }
 
-function checkColumn
-{
-	echo -e "Enter Column Name: \c"
-	read columnName
+function delete_special_rows {
+    local tbName="$1"
 
-	column=$(awk 'BEGIN{FS=","}{for(i=1;i<=NF;i++){if($i=="'$columnName'") print $i}}' databases/$currentDb/${tbName}_Schema 2>>./.error.log)
-	if [[ $column = "" ]]
-	then
-		echo "Invalid Column"
-		#checkColumn
-	else
-		checkCoulmnWithValue
-		echo "All data have this value are deleted"
-		echo "Back to table menu..."
-		sleep 3
-		clear
-	fi
-}
+    read -rp "Enter Column Name: " columnName
+    columnName=$(echo "$columnName" | xargs)
 
-function checkCoulmnWithValue 
-{
-	echo -e "Enter Column Value: \c"
-	read columnValue
-	typeset arrayRows[2]
-	index=0
+    # read schema line and strip trailing comma
+    schemaLine=$(head -n1 "databases/$currentDb/${tbName}_Schema" | sed 's/,$//')
+    IFS=',' read -ra parts <<< "$schemaLine"
 
-	columnVal=`awk 'BEGIN{FS=","}{for(i=1;i<=NF;i++){if($i=="'$columnName'"){j=i+1; if($j == "'$columnValue'"){print NR}}}}' databases/$currentDb/$tbName 2>>./.error.log`
-	for i in $columnVal
-	do
-		arrayRows[$index]=$i
-		(( index+=1 ))
-	done
+    # find column position (1-based in data rows)
+    colIndex=-1
+    for ((i=0; i<${#parts[@]}; i+=2)); do
+        if [[ "${parts[i]}" == "$columnName" ]]; then
+            colIndex=$((i/2 + 1))
+            break
+        fi
+    done
 
-	(( index=1 ))
-	line=""
-	for i in ${arrayRows[*]}
-	do
-		if [ $index -eq ${#arrayRows[*]} ]
-		then
-			line+="${i}d" 
-		else
-			line+="${i}d;" 
-		fi
-		(( index+=1 ))
-	done
-	`sed -i $line databases/$currentDb/$tbName 2>>./.error.log`
+    if [[ $colIndex -eq -1 ]]; then
+        echo "Invalid column"
+        return
+    fi
+
+    read -rp "Enter Column Value: " columnValue
+    columnValue=$(echo "$columnValue" | xargs)
+
+    # find matching lines
+    mapfile -t toDelete < <(awk -F, -v idx="$colIndex" -v val="$columnValue" '
+        function trim(s){ gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+        {
+            if (trim($idx) == val) print NR
+        }' "databases/$currentDb/$tbName")
+
+    if [ ${#toDelete[@]} -eq 0 ]; then
+        echo "No matching rows found."
+        return
+    fi
+
+    # delete those lines
+    sedExpr=""
+    for ln in "${toDelete[@]}"; do
+        sedExpr+="${ln}d;"
+    done
+    sedExpr=${sedExpr%;}
+
+    sed -i "$sedExpr" "databases/$currentDb/$tbName"
+    echo "Rows with value '$columnValue' in column '$columnName' deleted."
 }
 
 deleteRow
