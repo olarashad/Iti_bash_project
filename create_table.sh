@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# pause helper
 function pause_back_to_submenu {
     read -rp $'\nPress Enter to go back to the previous menu...' _
     clear
@@ -8,47 +7,40 @@ function pause_back_to_submenu {
     exit
 }
 
-#Create Table
 function createTable {
     echo -e "Enter Unique Table Name: \c"
     read tableName
 
-    #Check if table exists
     if [ -z "$tableName" ]; then
         echo "You must enter a valid name"
         clear
         ./submenu.sh 2
         exit
-    else 
-        source ./listTable.sh "call" "$tableName"
     fi
 
-    if [ "$tableExist" -eq 0 ]; then
-        # create Table and schema files
-        touch "databases/$currentDb/$tableName"
-        touch "databases/$currentDb/${tableName}_Schema"
-        echo -n "$tableName," >> "databases/$currentDb/Schema"
-        echo
-        echo "Table '$tableName' successfully created."
-        echo
-        echo "Please specify its columns and their data types."
-        echo
-        echo "Please note that the valid datatypes are: int, varchar, string!"
-        echo -n ""
-        insertCoulmn
-
-        # بعد ما كل حاجة تتظبط، نرجع للـ submenu
-        clear
-        ./submenu.sh 2
-        exit
-    else
+    if [[ -f "databases/$currentDb/$tableName" || -f "databases/$currentDb/${tableName}_Schema" ]]; then
         echo "Table already exists."
         clear
         ./submenu.sh 2
         exit
     fi
+
+    # Create Table and Schema
+    touch "databases/$currentDb/$tableName"
+    touch "databases/$currentDb/${tableName}_Schema"
+    echo -n "$tableName," >> "databases/$currentDb/Schema"
+    echo
+    echo "Table '$tableName' successfully created."
+    echo "Please specify its columns and their data types."
+    echo "Valid datatypes: int, varchar, string!"
+    insertCoulmn
+
+    clear
+    ./submenu.sh 2
+    exit
 }
 
+typeset columnArray[2]
 
 function insertCoulmn {
     echo
@@ -62,7 +54,6 @@ function insertCoulmn {
             echo
             echo -e "Enter Column $tracker: \c"
             read column
-            echo 
             echo -e "Enter DataType: \c"
             read dataType
 
@@ -87,8 +78,6 @@ function insertCoulmn {
     addPrimary
 }
 
-# Check Column
-typeset columnArray[2]
 function checkColumn {
     repeatFlag=0
     for i in "${columnArray[@]}"; do
@@ -100,7 +89,6 @@ function checkColumn {
     source ./dataType.sh "check" "$2"
 }
 
-# Add Primary Key
 function addPrimary {
     echo -e "Choose one column to be your PK and enter its name: \c"
     read primaryKey

@@ -1,2 +1,4 @@
-ola,id,int,name,varchar,id
-ola,id,int,name,varchar,id
+ola,id,int,name,varchar,id,age,int
+ola,id,int,name,varchar,id,age,int
+popo,id,int,name,varchar,id
+mero1,id,int,name,varchar,id
