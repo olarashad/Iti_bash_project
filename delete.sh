@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Delete Rows
-function delete
+function deleteRow
 {
 	echo -e "Enter Table Name: \c"
 	read tbName
@@ -11,14 +11,17 @@ function delete
 	then
 		echo "You Must Enter Valid Name"
 		exit
-	else
-		source ./listTable.sh "call" $tbName
+	# else
+	# 	source ./listTable.sh "call" $tbName
 	fi
 
 	if [ $tableExist -eq 0 ]
 	then
 		echo "Error, table dose not exist"
-		./redisplayMenus.sh 2
+		echo "Back to table menu..."
+		sleep 3
+		clear
+		./submenu.sh 2
 		exit
 	else
 		PS3="hosql-${tbName}>"
@@ -26,13 +29,17 @@ function delete
 		do
 			case $REPLY in
 				1) 
-					`sed -i '1,$d' databases/$currentDb/$tbName `
+					`sed -i '1,$d' databases/$currentDb/$tbName 2>>./.error.log`
 					echo "All $tbName Rows Are Deleted"
+					echo "Back to table menu..."
+					sleep 3
+					clear
 					./submenu.sh 2
 					exit
 				;;
 				2)
 					checkColumn
+
 					./submenu.sh 2
 					exit
 				;;
@@ -53,7 +60,7 @@ function checkColumn
 	echo -e "Enter Column Name: \c"
 	read columnName
 
-	column=$(awk 'BEGIN{FS=","}{for(i=1;i<=NF;i++){if($i=="'$columnName'") print $i}}' databases/$currentDb/${tbName}_Schema )
+	column=$(awk 'BEGIN{FS=","}{for(i=1;i<=NF;i++){if($i=="'$columnName'") print $i}}' databases/$currentDb/${tbName}_Schema 2>>./.error.log)
 	if [[ $column = "" ]]
 	then
 		echo "Invalid Column"
@@ -61,6 +68,9 @@ function checkColumn
 	else
 		checkCoulmnWithValue
 		echo "All data have this value are deleted"
+		echo "Back to table menu..."
+		sleep 3
+		clear
 	fi
 }
 
@@ -71,7 +81,7 @@ function checkCoulmnWithValue
 	typeset arrayRows[2]
 	index=0
 
-	columnVal=`awk 'BEGIN{FS=","}{for(i=1;i<=NF;i++){if($i=="'$columnName'"){j=i+1; if($j == "'$columnValue'"){print NR}}}}' databases/$currentDb/$tbName `
+	columnVal=`awk 'BEGIN{FS=","}{for(i=1;i<=NF;i++){if($i=="'$columnName'"){j=i+1; if($j == "'$columnValue'"){print NR}}}}' databases/$currentDb/$tbName 2>>./.error.log`
 	for i in $columnVal
 	do
 		arrayRows[$index]=$i
@@ -90,7 +100,7 @@ function checkCoulmnWithValue
 		fi
 		(( index+=1 ))
 	done
-	`sed -i $line databases/$currentDb/$tbName `
+	`sed -i $line databases/$currentDb/$tbName 2>>./.error.log`
 }
 
-delete
+deleteRow

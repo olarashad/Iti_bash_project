@@ -1,19 +1,12 @@
-#!/usr/bin/env bash
-# Simple Bash DBMS CLI
-# Each database is a directory; each table is a CSV file + a .meta file describing columns
 
-
-
-
-# Globals
 DB_PATH=""
 
-# Helpers
+
 function pause() {
-  read -rp "\nPress [Enter] to continue..."
+  read -rp "If you want to continue press Enter ..."
 }
 
-# ------- Main Menu Functions -------
+
 function create_database() {
   read -rp "Enter database name: " db
   if [[ -z "$db" ]]; then
@@ -22,30 +15,30 @@ function create_database() {
     echo "Database '$db' already exists."
   else
     while true; do
-      read -rsp "🔐 Enter password for database '$db': " password
+      read -rsp "please enter password for database '$db': " password
       echo
-      read -rsp "🔁 Confirm password: " confirm
+      read -rsp "Confirm password: " confirm
       echo
       if [[ "$password" == "$confirm" && -n "$password" ]]; then
         break
       else
-        echo "❌ Passwords do not match or are empty. Try again."
+        echo "Passwords do not match or  empty. please try again."
       fi
     done
    mkdir -p "databases/$db"
     echo -n "$password" > "databases/$db/.dbpass"
     chmod 600 "databases/$db/.dbpass"
 
-    echo "✅ Database '$db' created and secured with a password."
+    echo "Database '$db' created and secured with a password."
   fi
   pause
 }
   
 function list_databases() {
-    function list_databases() {
+  
   echo "Available databases:"
   shopt -s nullglob
-  local dbs=(*./databases/)
+local dbs=(databases/*/)
   shopt -u nullglob
   if [[ ${#dbs[@]} -eq 0 ]]; then
     echo "There are no databases."
@@ -56,7 +49,7 @@ function list_databases() {
   fi
   pause
 }
-}
+
 
 
 function drop_database() {
@@ -65,26 +58,12 @@ function drop_database() {
 
 
 function connect_database() {
-  read -rp "Enter database name to connect: " db
+  read -rp "please enter database name to connect: " db
   ./connect_db.sh "$db"
 }
 
-# function connect_database() {
-#   read -rp "Enter database name to connect: " db
-#   if [[ -d "$db" ]]; then
-#     currentDb="$db"
-#     export currentDb
-#     echo "Connected to database '$db'."
-    
-#     # Call the script responsible for opening the table menu
-#     ./connect_db.sh "$db"
-#   else
-#     echo "❌ Database '$db' does not exist."
-#     pause
-#   fi
-# }
 
-# ------- Menu Loops -------
+
 function main_menu() {
   while true; do
     clear
@@ -100,13 +79,13 @@ function main_menu() {
       2) list_databases;;
       3) connect_database;;
       4) drop_database;;
-      5) echo "Goodbye!"; exit 0;;
+      5) echo "Goodbye, see you soon!!"; exit 0;;
       *) echo "Invalid option."; pause;;
     esac
   done
 }
 
-# Entry point
+
 enable_paging() {
   shopt -s extglob
 }

@@ -5,13 +5,13 @@ function connect_to_db {
 
     while true; do
         if [ -z "$dbName" ] || [ ! -d "$dbPath" ]; then
-            echo "❌ Database '$dbName' does not exist."
-
-            echo ""
+            clear
+            echo "Database '$dbName' does not exist."
+            echo
             echo "What would you like to do?"
             echo "1) Try again"
             echo "2) Return to main menu"
-            echo ""
+            echo
 
             read -rp "Choose an option [1-2]: " choice
             case $choice in
@@ -21,57 +21,59 @@ function connect_to_db {
                     passFile="$dbPath/.dbpass"
                     ;;
                 2)
-                    echo "🔙 Returning to main menu..."
+                    echo "Returning to main menu..."
                     sleep 1
                     exit 0
                     ;;
                 *)
-                    echo "❌ Invalid choice. Returning to main menu."
+                    echo "Invalid choice. Returning to main menu."
                     sleep 1
                     exit 1
                     ;;
             esac
 
         elif [ ! -f "$passFile" ]; then
-            echo "⚠️ No password file found for '$dbName'. Cannot connect."
+            clear
+            echo "No password file found for '$dbName'. Cannot connect."
+            sleep 1
             exit 1
 
         else
-            read -rsp "🔐 Enter password for '$dbName': " inputPass
+            read -rsp "Enter password for '$dbName': " inputPass
             echo
 
             storedPass=$(<"$passFile")
 
             if [[ "$inputPass" == "$storedPass" ]]; then
                 export currentDb="$dbName"
-                echo "✅ Connected to database '$currentDb'."
+                clear
+                echo "Connected to database '$currentDb'."
+                echo
+                echo "You can now perform operations on '$currentDb' database..."
+                echo
+
+                # يفتح الـ submenu في صفحة نظيفة
                 ./submenu.sh
+                echo
                 break
             else
-                echo "❌ Incorrect password."
-
-                echo ""
+                clear
+                echo "Incorrect password."
+                echo
                 echo "What would you like to do?"
                 echo "1) Try again"
                 echo "2) Return to main menu"
-                echo ""
+                echo
 
                 read -rp "Choose an option [1-2]: " passChoice
                 case $passChoice in
                     1) continue ;;
-                    2) echo "🔙 Returning to main menu..."; exit 0 ;;
-                    *) echo "❌ Invalid choice. Exiting."; exit 1 ;;
+                    2) echo "Returning to main menu..."; exit 0 ;;
+                    *) echo "Invalid choice. Exiting."; exit 1 ;;
                 esac
             fi
         fi
     done
 }
 
-# enable_paging() {
-#   shopt -s extglob
-# }
-
-
-
-# enable_paging
 connect_to_db "$1"

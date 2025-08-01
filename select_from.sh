@@ -8,7 +8,9 @@ function checkTableExistance
     if [ -z $tbName ]
     then
         echo "Error, empty input"
-        echo "Back to table menu"
+        echo "Back to table menu..."
+        sleap 3
+        clear
         ./submenu.sh 2
 		exit
     fi
@@ -25,7 +27,9 @@ function checkTableExistance
     if [ $tblIsExist -eq 0 ]
     then 
         echo "Error, table dose not exist"
-        echo "Back to table menu"
+        echo "Back to table menu..."
+        sleep 3
+        clear
         ./submenu.sh 2
 		exit
     fi
@@ -81,7 +85,9 @@ function selectRows
                     fi
                 ;;
             "Exit")
-                    echo "Back to table menu"
+                    echo "Back to table menu..."
+                    sleep 3
+                    clear
                     ./submenu.sh 2
 		            exit
                 ;;

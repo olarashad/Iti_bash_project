@@ -1,6 +1,17 @@
 #!/bin/bash
 
+# pause helper
+function pause {
+    read -rp $'\nPress Enter to continue...' _
+    clear
+    ./submenu.sh 2
+    exit
+}
+
 # List all tables
+echo "the existing tables in the database '$currentDb' are:"
+echo
+
 if [ "$1" == "list" ]; then
     num=0
     for table in databases/$currentDb/*; do
@@ -9,8 +20,7 @@ if [ "$1" == "list" ]; then
         ((num++))
         echo "$num- $filename"
     done
-    ./submenu.sh
-    exit
+    pause
 fi
 
 # Check if a specific table exists

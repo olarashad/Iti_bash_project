@@ -3,8 +3,10 @@
 #Check table existance
 function checkTableExistance
 {
-    echo -e "Enter table name: \c"
-    read tbName
+    # echo -p "Enter table name: \c"
+    # echo
+    # read tbName
+    read -p "Enter Table Name: " tbName
     if [ -z $tbName ]
     then
         echo "Error, empty input"
@@ -64,6 +66,8 @@ countTableField
 #Insert new column
 function insert
 {
+    echo
+    echo "you can insert column data by pressing 1 and exit the insert mode by pressing 2"
     select choice in "Insert Column" "Exit"
     do
         case $choice in
@@ -83,6 +87,8 @@ function insert
                     fi   
                 ;;
                 "Exit")
+                    echo
+                    echo "Exiting insert mode ..."
                     for ((i=0;i<"$rowDataCounter-1";i++));do
                         echo -e "${rowData[i]},\c" >> databases/$currentDb/$tbName
                     done 
@@ -91,11 +97,13 @@ function insert
                         echo "${rowData[((rowDataCounter-1))]}" >> databases/$currentDb/$tbName
                     fi  
                     echo "Back to table menu"
+                    sleep 3
+                    clear
                     ./submenu.sh 2
                     exit
                 ;;
                 *)
-                    echo "Invalid choice"
+                    echo "Invalid choice either 1 or 2 are allowed"
                 ;;
         esac
     done
